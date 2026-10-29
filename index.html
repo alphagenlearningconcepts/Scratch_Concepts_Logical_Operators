@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Lesson: Logical Operators (AND, OR)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        alphagen: {
+                            purple: '#5E48C4',
+                            purpleDark: '#4A3AAD',
+                            purpleMid: '#7B6ED4',
+                            purplePale: '#EAE7FE',
+                            purpleGhost: '#F5F4FF',
+                            yellow: '#FFD071',
+                            yellowDark: '#E6B84A',
+                            nearBlack: '#1A1A1A',
+                            lightGrey: '#F2F2F4',
+                            cyan: '#59E4FB',
+                            cyanDark: '#055F6E',
+                            coral: '#ED5661',
+                            coralDark: '#993040'
+                        },
+                        brand: {
+                            purple: '#5E48C4',
+                            purpleDark: '#4A3AAD',
+                            purpleMid: '#7B6ED4',
+                            purplePale: '#EAE7FE',
+                            purpleGhost: '#F5F4FF',
+                            yellow: '#FFD071',
+                            yellowDark: '#E6B84A',
+                            nearBlack: '#1A1A1A',
+                            lightGrey: '#F2F2F4',
+                            cyan: '#59E4FB',
+                            cyanDark: '#055F6E',
+                            coral: '#ED5661',
+                            coralDark: '#993040'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F5F4FF;
+            color: #1A1A1A;
+            user-select: none;
+        }
+
+        .yellow-highlight {
+            position: relative;
+            display: inline-block;
+        }
+
+        .yellow-highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background-color: #FFD071;
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .gate-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gate-center {
+            width: 56px;
+            height: 56px;
+            background: #5E48C4;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(94,72,196,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .gate-status-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ED5661;
+            box-shadow: 0 0 10px rgba(237,86,97,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .gate-status-light.active {
+            background: #59A942;
+            box-shadow: 0 0 15px rgba(89,169,66,0.8);
+        }
+
+        .gate-visual {
+            width: 190px;
+            height: 100px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gate-post {
+            position: absolute;
+            bottom: 8px;
+            width: 12px;
+            height: 70px;
+            background: #7B6ED4;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .gate-post.left { left: 25px; }
+        .gate-post.right { right: 25px; }
+
+        .gate-panel {
+            position: absolute;
+            bottom: 26px;
+            width: 62px;
+            height: 12px;
+            border: 3px solid #ED5661;
+            background: #FFD071;
+            border-radius: 5px;
+            transition: transform .35s ease, border-color .35s ease;
+        }
+
+        .gate-panel.left {
+            left: 34px;
+            transform-origin: left center;
+        }
+
+        .gate-panel.right {
+            right: 34px;
+            transform-origin: right center;
+        }
+
+        .gate-visual.open .gate-panel {
+            border-color: #59A942;
+        }
+
+        .gate-visual.open .gate-panel.left {
+            transform: rotate(-58deg);
+        }
+
+        .gate-visual.open .gate-panel.right {
+            transform: rotate(58deg);
+        }
+
+        .scratch-block-container {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            color: #FFFFFF;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .scratch-c-if {
+            background-color: #FFAB19;
+            border-radius: 4px;
+            padding: 6px 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            min-width: 240px;
+        }
+
+        .scratch-c-top {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .scratch-boolean-slot {
+            background-color: #59B43E;
+            border-radius: 16px;
+            padding: 3px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+        }
+
+        .scratch-inner-pill {
+            background-color: #FFFFFF;
+            color: #575E75;
+            border-radius: 12px;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-weight: 500;
+        }
+
+        .scratch-c-inner-body {
+            background-color: #FFFFFF;
+            border-radius: 4px;
+            padding: 6px;
+            margin-top: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .scratch-action-look {
+            background-color: #4C97FF;
+            border-radius: 4px;
+            padding: 5px 10px;
+            color: white;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        .scratch-action-green {
+            background-color: #59A942;
+        }
+
+        .operator-stage {
+            position: relative;
+            height: 160px;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #F5F4FF;
+            border: 2px dashed #7B6ED4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quiz-feedback {
+            min-height: 28px;
+            transition: all 0.2s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1A1A1A;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #5E48C4;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen w-screen flex flex-col bg-brand-purpleGhost">
+
+    <div class="w-full px-4 pt-4">
+        <header class="w-full bg-alphagen-purple px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-white shadow-md rounded-2xl">
+            <div class="flex items-center gap-3">
+                <a href="#" class="bg-alphagen-yellow hover:bg-alphagen-yellowDark text-alphagen-nearBlack px-4 py-2 rounded-xl font-extrabold text-xs md:text-sm shadow-sm transition-all flex items-center gap-2">
+                    <span class="tracking-wide">ALPHAGEN LEARNING</span>
+                </a>
+                <span class="font-extrabold text-base md:text-xl tracking-tight text-white">
+                    Scratch - Game Based Learning
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleAudio()" id="audio-btn"
+                        class="bg-alphagen-purpleDark hover:bg-alphagen-purpleMid text-white p-2 rounded-lg transition-all"
+                        title="Toggle Sound">
+                    <i class="fa-solid fa-volume-high text-base" id="sound-icon"></i>
+                </button>
+            </div>
+        </header>
+    </div>
+
+    <main class="flex-1 relative flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+
+        <!-- SLIDE 1 -->
+        <section id="slide-1" class="slide active flex-col items-center justify-center max-w-3xl mx-auto w-full">
+            <div class="w-24 h-24 sm:w-32 sm:h-32 bg-brand-purplePale rounded-full flex items-center justify-center mb-6 shadow-inner animate-bounce">
+                <span class="text-5xl sm:text-6xl">⚡</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-brand-nearBlack mb-4 leading-tight text-center">
+                The Magic of
+                <span class="text-brand-purple yellow-highlight">Logical Operators!</span>
+            </h1>
+
+            
+
+            <button onclick="nextSlide()"
+                    class="bg-brand-yellow hover:bg-brand-yellowDark text-brand-nearBlack font-bold text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-200">
+                Let's Explore!
+            </button>
+        </section>
+
+        <!-- SLIDE 2 -->
+        <section id="slide-2" class="slide flex-col items-center justify-center max-w-4xl mx-auto w-full">
+            <div class="text-center mb-4">
+                <span class="text-brand-purple font-semibold text-xs uppercase tracking-widest">Real Life Analogy</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-brand-nearBlack">Amusement Park Ride Access</h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border-2 border-brand-purplePale shadow-md w-full max-w-2xl">
+                <p class="text-sm text-gray-600 text-center mb-4">
+                    Test requirements (e.g., Height AND Ticket) to open the gate!
+                </p>
+
+                <div class="relative bg-brand-purpleGhost rounded-2xl border border-brand-purpleMid/30 h-48 overflow-hidden flex flex-col items-center justify-center">
+                    <div class="gate-container flex flex-col items-center gap-2">
+                        <div id="gate-light" class="gate-status-light"></div>
+                        <div id="gate-visual" class="gate-visual" aria-label="Ride gate">
+                            <div class="gate-post left"></div>
+                            <div class="gate-post right"></div>
+                            <div class="gate-panel left"></div>
+                            <div class="gate-panel right"></div>
+                        </div>
+                    </div>
+
+                    <!-- <div id="gate-status-text" class="absolute bottom-3 text-xs font-bold text-brand-coral">
+                        Status: Gate Locked (Conditions not met)
+                    </div> -->
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3 mt-4">
+                    <button onclick="toggleCondition('ticket')" id="btn-ticket"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        🎟️ Has Ticket: NO
+                    </button>
+                    <button onclick="toggleCondition('height')" id="btn-height"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        📏 Tall Enough: NO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: AND OPERATOR -->
+        <section id="slide-3" class="slide flex-col items-center justify-center max-w-4xl mx-auto w-full">
+            <div class="text-center mb-3">
+                <span class="text-brand-purple font-semibold text-xs uppercase tracking-widest">Logical Operator 1 of 2</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-brand-nearBlack">
+                    The <span class="text-brand-purple">AND</span> Operator
+                </h2>
+                
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border-2 border-brand-purplePale shadow-sm w-full max-w-2xl flex flex-col items-center">
+                <div class="mb-4 w-full flex justify-center">
+                    <div class="scratch-block-container">
+                        <div class="scratch-c-if">
+                            <div class="scratch-c-top">
+                                <span>if</span>
+                                <div class="scratch-boolean-slot">
+                                    <span class="scratch-inner-pill">has batteries?</span>
+                                    <span>and</span>
+                                    <span class="scratch-inner-pill">switch is on?</span>
+                                </div>
+                                <span>then</span>
+                            </div>
+                            <div class="scratch-c-inner-body">
+                                <div class="scratch-action-look">turn torch light ON 🔦</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 w-full">
+                    <span class="text-[11px] font-bold text-gray-500 block mb-1">Stage Output:</span>
+                    <div id="torch-stage" class="operator-stage">
+                        <div id="torch-icon" class="text-4xl mb-2">🌑</div>
+                        <div id="torch-message" class="text-xs text-brand-coral font-semibold p-2 text-center">
+                            Torch is OFF (Batteries AND Switch required)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="toggleTorch('battery')" id="btn-torch-battery"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        🔋 Has Batteries: NO
+                    </button>
+                    <button onclick="toggleTorch('switch')" id="btn-torch-switch"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        🎛️ Switch On: NO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: OR OPERATOR - GAME REWARD EXAMPLE -->
+        <section id="slide-4" class="slide flex-col items-center justify-center max-w-4xl mx-auto w-full">
+            <div class="text-center mb-4">
+                <span class="text-brand-purple font-semibold text-xs uppercase tracking-widest">
+                    Real Life Analogy
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-brand-nearBlack">
+                    Win a Game Reward!
+                </h2>
+                <p class="text-sm text-gray-600 mt-2 max-w-xl mx-auto">
+                    Collect 5 stars <b>OR</b> find a magic gem to win a reward!
+                </p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border-2 border-brand-purplePale shadow-md w-full max-w-2xl">
+                <div class="relative bg-brand-purpleGhost rounded-2xl border border-brand-purpleMid/30 h-48 overflow-hidden flex flex-col items-center justify-center">
+                    <div class="text-6xl mb-2" id="or-gate-visual" aria-label="Treasure chest">🔒🧰</div>
+                    <div id="or-gate-light" class="gate-status-light"></div>
+                    <div id="or-gate-status" class="absolute bottom-3 text-xs font-bold text-brand-coral">
+                        Find 5 stars OR a magic gem!
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3 mt-4">
+                    <button onclick="toggleReward('stars')" id="btn-reward-stars"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        ⭐ Collect 5 Stars: NO
+                    </button>
+                    <button onclick="toggleReward('gem')" id="btn-reward-gem"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        💎 Find Magic Gem: NO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: OR OPERATOR FRONT DOOR EXAMPLE -->
+        <section id="slide-5" class="slide flex-col items-center justify-center max-w-4xl mx-auto w-full">
+            <div class="text-center mb-3">
+                <span class="text-brand-purple font-semibold text-xs uppercase tracking-widest">Logical Operator 2 of 2</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-brand-nearBlack">
+                    The <span class="text-brand-purple">OR</span> Operator
+                </h2>
+                <p class="text-xs text-gray-500 mt-1 max-w-md mx-auto">
+                    Example: You can open the front door with a key <b>or</b> a code.
+                </p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border-2 border-brand-purplePale shadow-sm w-full max-w-2xl flex flex-col items-center">
+                <div class="mb-4 w-full flex justify-center">
+                    <div class="scratch-block-container">
+                        <div class="scratch-c-if">
+                            <div class="scratch-c-top">
+                                <span>if</span>
+                                <div class="scratch-boolean-slot">
+                                    <span class="scratch-inner-pill">has key?</span>
+                                    <span>or</span>
+                                    <span class="scratch-inner-pill">correct code?</span>
+                                </div>
+                                <span>then</span>
+                            </div>
+                            <div class="scratch-c-inner-body">
+                                <div class="scratch-action-look scratch-action-green">open front door 🚪</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 w-full">
+                    <span class="text-[11px] font-bold text-gray-500 block mb-1">Stage Output:</span>
+                    <div id="door-stage" class="operator-stage">
+                        <div id="door-icon" class="text-4xl mb-2">🔒</div>
+                        <div id="door-message" class="text-xs text-brand-coral font-semibold p-2 text-center">
+                            Door is Locked (Key OR Code needed)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="toggleDoor('key')" id="btn-door-key"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        🔑 Has Key: NO
+                    </button>
+                    <button onclick="toggleDoor('code')" id="btn-door-code"
+                            class="bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        🔢 Correct Code: NO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: VISUAL SCRATCH BLOCK QUIZ -->
+        <section id="slide-6" class="slide flex-col items-center justify-center max-w-4xl mx-auto w-full">
+            <div class="text-center mb-4">
+                <span class="text-brand-purple font-semibold text-xs uppercase tracking-widest">Quick Quiz</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-brand-nearBlack">
+                    Which Scratch block opens the door?
+                </h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border-2 border-brand-purplePale shadow-sm w-full max-w-xl text-center">
+                <div class="text-5xl mb-3">🚪</div>
+                <p class="text-xs text-gray-600 mb-4">
+                    The door opens if you have a key OR know the code.
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button onclick="checkQuiz(false)"
+                            class="bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-xl p-3 transition-all">
+                        <div class="scratch-block-container">
+                            <div class="scratch-boolean-slot">
+                                <span class="scratch-inner-pill">has key?</span>
+                                <span>and</span>
+                                <span class="scratch-inner-pill">knows code?</span>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button onclick="checkQuiz(true)"
+                            class="bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-xl p-3 transition-all">
+                        <div class="scratch-block-container">
+                            <div class="scratch-boolean-slot">
+                                <span class="scratch-inner-pill">has key?</span>
+                                <span>or</span>
+                                <span class="scratch-inner-pill">knows code?</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                <div id="quiz-feedback" class="quiz-feedback mt-4 text-xs font-bold"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-10">
+        <button id="btn-prev" onclick="prevSlide()"
+                class="bg-gray-100 hover:bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs sm:text-sm">
+            ⬅️ Previous
+        </button>
+
+        <select id="slide-jump" onchange="jumpToSlide(this.value)"
+                class="bg-brand-purpleGhost border border-brand-purpleMid text-brand-purple text-xs font-bold px-3 py-2 rounded-xl">
+            <option value="1">1. Welcome</option>
+            <option value="2">2. Ride Analogy</option>
+            <option value="3">3. AND Operator</option>
+            <option value="4">4. OR Operator Intro</option>
+            <option value="5">5. OR Example</option>
+            <option value="6">6. Visual Quiz</option>
+        </select>
+
+        <button id="btn-next" onclick="nextSlide()"
+                class="bg-brand-purple hover:bg-brand-purpleDark text-white font-bold px-5 py-2 rounded-xl text-xs sm:text-sm">
+            Next ➡
+        </button>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 6;
+        let audioEnabled = true;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSessionSound() {
+            if (!audioEnabled) return;
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+
+            const icon = document.getElementById('sound-icon');
+            const button = document.getElementById('audio-btn');
+
+            if (audioEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-base';
+                button.title = 'Mute Sound';
+                playSessionSound();
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-base';
+                button.title = 'Turn Sound On';
+            }
+        }
+
+        function updateSlide() {
+            document.querySelectorAll('.slide').forEach((slide, index) => {
+                slide.classList.remove('active');
+
+                if (index + 1 === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slide-jump').value = currentSlide;
+            document.getElementById('btn-prev').style.visibility =
+                currentSlide === 1 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').style.visibility =
+                currentSlide === totalSlides ? 'hidden' : 'visible';
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                playSessionSound();
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                playSessionSound();
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function jumpToSlide(num) {
+            playSessionSound();
+            currentSlide = parseInt(num);
+            updateSlide();
+        }
+
+        /* SLIDE 2: AND ANALOGY */
+        let hasTicket = false;
+        let tallEnough = false;
+
+        function toggleCondition(type) {
+            playSessionSound();
+
+            if (type === 'ticket') {
+                hasTicket = !hasTicket;
+
+                const btn = document.getElementById('btn-ticket');
+                btn.innerText = `🎟️ Has Ticket: ${hasTicket ? 'YES' : 'NO'}`;
+                btn.className = hasTicket
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+
+            } else if (type === 'height') {
+                tallEnough = !tallEnough;
+
+                const btn = document.getElementById('btn-height');
+                btn.innerText = `📏 Tall Enough: ${tallEnough ? 'YES' : 'NO'}`;
+                btn.className = tallEnough
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+            }
+
+            const light = document.getElementById('gate-light');
+            const gateVisual = document.getElementById('gate-visual');
+            const statusText = document.getElementById('gate-status-text');
+
+            if (hasTicket && tallEnough) {
+                light.classList.add('active');
+                gateVisual.classList.add('open');
+                statusText.innerText = 'Status: Gate Open! (AND condition met)';
+                statusText.className = 'absolute bottom-3 text-xs font-bold text-green-600';
+            } else {
+                light.classList.remove('active');
+                gateVisual.classList.remove('open');
+                statusText.innerText = 'Status: Gate Locked (Both Ticket AND Height required)';
+                statusText.className = 'absolute bottom-3 text-xs font-bold text-brand-coral';
+            }
+        }
+
+        /* SLIDE 4: GAME REWARD (OR) SIMULATION */
+        let rewardStars = false;
+        let rewardGem = false;
+
+        function toggleReward(type) {
+            playSessionSound();
+
+            if (type === 'stars') {
+                rewardStars = !rewardStars;
+
+                const btn = document.getElementById('btn-reward-stars');
+                btn.innerText = `⭐ Collect 5 Stars: ${rewardStars ? 'YES' : 'NO'}`;
+                btn.className = rewardStars
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+
+            } else if (type === 'gem') {
+                rewardGem = !rewardGem;
+
+                const btn = document.getElementById('btn-reward-gem');
+                btn.innerText = `💎 Find Magic Gem: ${rewardGem ? 'YES' : 'NO'}`;
+                btn.className = rewardGem
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+            }
+
+            const light = document.getElementById('or-gate-light');
+            const visual = document.getElementById('or-gate-visual');
+            const status = document.getElementById('or-gate-status');
+
+            if (rewardStars || rewardGem) {
+                light.classList.add('active');
+                visual.innerText = '🎁';
+                status.innerText = 'You win a reward! Just one condition is enough.';
+                status.className = 'absolute bottom-3 text-xs font-bold text-green-600';
+
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 25,
+                        spread: 35,
+                        origin: { y: 0.6 }
+                    });
+                }
+            } else {
+                light.classList.remove('active');
+                visual.innerText = '🔒🧰';
+                status.innerText = 'Find 5 stars OR a magic gem!';
+                status.className = 'absolute bottom-3 text-xs font-bold text-brand-coral';
+            }
+        }
+
+        /* SLIDE 3: TORCH (AND) SIMULATION */
+        let torchBattery = false;
+        let torchSwitch = false;
+
+        function toggleTorch(type) {
+            playSessionSound();
+
+            if (type === 'battery') {
+                torchBattery = !torchBattery;
+
+                const btn = document.getElementById('btn-torch-battery');
+                btn.innerText = `🔋 Has Batteries: ${torchBattery ? 'YES' : 'NO'}`;
+                btn.className = torchBattery
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+
+            } else if (type === 'switch') {
+                torchSwitch = !torchSwitch;
+
+                const btn = document.getElementById('btn-torch-switch');
+                btn.innerText = `🎛️ Switch On: ${torchSwitch ? 'YES' : 'NO'}`;
+                btn.className = torchSwitch
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+            }
+
+            const icon = document.getElementById('torch-icon');
+            const msg = document.getElementById('torch-message');
+
+            if (torchBattery && torchSwitch) {
+                icon.innerText = '💡';
+                msg.innerText = 'Torch is ON! (Batteries AND Switch are TRUE)';
+                msg.className = 'text-xs text-green-600 font-semibold p-2 text-center';
+
+                confetti({
+                    particleCount: 25,
+                    spread: 35,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                icon.innerText = '🌑';
+                msg.innerText = 'Torch is OFF (Both Batteries AND Switch must be TRUE)';
+                msg.className = 'text-xs text-brand-coral font-semibold p-2 text-center';
+            }
+        }
+
+        /* SLIDE 5: DOOR (OR) SIMULATION */
+        let doorKey = false;
+        let doorCode = false;
+
+        function toggleDoor(type) {
+            playSessionSound();
+
+            if (type === 'key') {
+                doorKey = !doorKey;
+
+                const btn = document.getElementById('btn-door-key');
+                btn.innerText = `🔑 Has Key: ${doorKey ? 'YES' : 'NO'}`;
+                btn.className = doorKey
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+
+            } else if (type === 'code') {
+                doorCode = !doorCode;
+
+                const btn = document.getElementById('btn-door-code');
+                btn.innerText = `🔢 Correct Code: ${doorCode ? 'YES' : 'NO'}`;
+                btn.className = doorCode
+                    ? 'bg-brand-purple text-white font-bold px-4 py-2 rounded-xl text-xs transition-all'
+                    : 'bg-gray-200 text-brand-nearBlack font-bold px-4 py-2 rounded-xl text-xs transition-all';
+            }
+
+            const icon = document.getElementById('door-icon');
+            const msg = document.getElementById('door-message');
+
+            if (doorKey || doorCode) {
+                icon.innerText = '🚪';
+                msg.innerText = 'Front Door Open! (OR condition met: at least one is true)';
+                msg.className = 'text-xs text-green-600 font-semibold p-2 text-center';
+
+                confetti({
+                    particleCount: 25,
+                    spread: 35,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                icon.innerText = '🔒';
+                msg.innerText = 'Door is Locked (Need Key OR Correct Code)';
+                msg.className = 'text-xs text-brand-coral font-semibold p-2 text-center';
+            }
+        }
+
+        /* SLIDE 6: QUIZ */
+        function checkQuiz(isCorrect) {
+            playSessionSound();
+
+            const feedback = document.getElementById('quiz-feedback');
+
+            if (isCorrect) {
+                feedback.innerText = 'Correct! OR needs just one true condition.';
+                feedback.className = 'quiz-feedback mt-4 text-xs font-bold text-brand-purple';
+
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.65 }
+                });
+            } else {
+                feedback.innerText = 'Not quite. Try again!';
+                feedback.className = 'quiz-feedback mt-4 text-xs font-bold text-brand-coral';
+            }
+        }
+
+        updateSlide();
+    </script>
+</body>
+</html>
